@@ -8,5 +8,13 @@
     <artifactId>IckProject</artifactId>
     <version>1.0</version>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>javacv</artifactId>
+            <version>0.10</version>
+        </dependency>
+    </dependencies>
+
     
 </project>
