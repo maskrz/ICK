@@ -66,6 +66,9 @@ public class MainMenu {
 
         opencv_core.CvMemStorage storage = opencv_core.CvMemStorage.create();
 
+        // used to decrease options
+        int counter = 0;
+
         while (canvasFrame.isVisible() && (frame = grabber.grab()) != null) {
             cvSmooth(frame, frame, CV_GAUSSIAN, 9, 9, 2, 2);
             if (image == null) {
@@ -124,27 +127,32 @@ public class MainMenu {
         // sound
         CvScalar cvScalar = soundSelected ? opencv_core.CvScalar.BLACK : opencv_core.CvScalar.BLUE;
         cvRectangle(image, cvPoint(0, 0), cvPoint(80, 80), cvScalar, 3, CV_AA, 0);
+        opencv_core.cvLine(image, cvPoint(40, 40), cvPoint(40, 40), cvScalar, getThickness(SOUND), CV_AA, 0);
         opencv_core.cvInitFont(font, FONT_HERSHEY_SIMPLEX, 0.2, 1);
         cvPutText(image, "dzwiek", cvPoint(85, 40), font, opencv_core.CvScalar.BLUE);
 
         // exit
         cvRectangle(image, cvPoint(560, 0), cvPoint(640, 80), opencv_core.CvScalar.RED, 3, CV_AA, 0);
+        opencv_core.cvLine(image, cvPoint(600, 40), cvPoint(600, 40), opencv_core.CvScalar.RED, getThickness(EXIT), CV_AA, 0);
         opencv_core.cvInitFont(font, FONT_HERSHEY_SIMPLEX, 0.2, 1);
         cvPutText(image, "wyjscie", cvPoint(480, 40), font, opencv_core.CvScalar.RED);
 
         // 2 graczy
         cvScalar = twoPlayersSelected ? opencv_core.CvScalar.BLACK : opencv_core.CvScalar.YELLOW;
         cvRectangle(image, cvPoint(0, 400), cvPoint(80, 480), cvScalar, 3, CV_AA, 0);
+        opencv_core.cvLine(image, cvPoint(40, 440), cvPoint(40, 440), cvScalar, getThickness(TWO_PLAYERS), CV_AA, 0);
         opencv_core.cvInitFont(font, FONT_HERSHEY_SIMPLEX, 0.2, 1);
         cvPutText(image, "2 graczy", cvPoint(85, 460), font, opencv_core.CvScalar.YELLOW);
 
         // start
         cvRectangle(image, cvPoint(560, 400), cvPoint(640, 480), opencv_core.CvScalar.GREEN, 3, CV_AA, 0);
+        opencv_core.cvLine(image, cvPoint(600, 440), cvPoint(600, 440), opencv_core.CvScalar.GREEN, getThickness(START), CV_AA, 0);
         opencv_core.cvInitFont(font, FONT_HERSHEY_SIMPLEX, 0.2, 1);
         cvPutText(image, "start", cvPoint(500, 460), font, opencv_core.CvScalar.GREEN);
 
         // dimensions
         cvRectangle(image, cvPoint(0, 200), cvPoint(80, 280), opencv_core.CvScalar.MAGENTA, 3, CV_AA, 0);
+        opencv_core.cvLine(image, cvPoint(40, 240), cvPoint(40, 240), opencv_core.CvScalar.MAGENTA, getThickness(DIMENSIONS), CV_AA, 0);
         opencv_core.cvInitFont(font, FONT_HERSHEY_SIMPLEX, 0.2, 1);
         cvPutText(image, dimensions[actuallDimensions], cvPoint(85, 260), font, opencv_core.CvScalar.MAGENTA);
     }
@@ -198,18 +206,18 @@ public class MainMenu {
     }
 
     private void checkBuffors() {
-        if (buffors[SOUND] >= 30) {
+        if (buffors[SOUND] >= 20) {
             resetBuffors();
             soundSelected = !soundSelected;
-        } else if (buffors[EXIT] >= 30) {
+        } else if (buffors[EXIT] >= 20) {
             this.canvasFrame.dispose();
-        } else if (buffors[TWO_PLAYERS] >= 30) {
+        } else if (buffors[TWO_PLAYERS] >= 20) {
             resetBuffors();
             twoPlayersSelected = !twoPlayersSelected;
-        } else if (buffors[START] >= 30) {
+        } else if (buffors[START] >= 20) {
             resetBuffors();
             // start game
-        } else if (buffors[DIMENSIONS] >= 30) {
+        } else if (buffors[DIMENSIONS] >= 20) {
             resetBuffors();
             actuallDimensions = actuallDimensions == 2? 0 : actuallDimensions +1;
         }
@@ -217,5 +225,23 @@ public class MainMenu {
 
     private void resetBuffors() {
         buffors = new int[5];
+    }
+
+    private int getThickness(int buffor) {
+        double percentage = buffors[buffor]/30d;
+        double t = 80d * percentage;
+        return (int)t;
+    }
+
+    private void decreaseOptions() {
+        for ( int i =0; i < 5; i ++) {
+            buffors[i] --;
+        }
+
+        for ( int i =0; i < 5; i ++) {
+            if (buffors[i] < 0) {
+                buffors[i] = 0;
+            }
+        }
     }
 }
