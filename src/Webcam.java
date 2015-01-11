@@ -9,14 +9,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bytedeco.javacpp.Loader;
 import static org.bytedeco.javacpp.helper.opencv_objdetect.cvHaarDetectObjects;
-import org.bytedeco.javacpp.opencv_core;
 import static org.bytedeco.javacpp.opencv_core.CV_AA;
-import org.bytedeco.javacpp.opencv_core.CvFont;
 import org.bytedeco.javacpp.opencv_core.CvMemStorage;
 import org.bytedeco.javacpp.opencv_core.CvRect;
 import org.bytedeco.javacpp.opencv_core.CvScalar;
 import org.bytedeco.javacpp.opencv_core.CvSeq;
-import static org.bytedeco.javacpp.opencv_core.FONT_HERSHEY_SIMPLEX;
 import static org.bytedeco.javacpp.opencv_core.IPL_DEPTH_8U;
 import org.bytedeco.javacpp.opencv_core.IplImage;
 import static org.bytedeco.javacpp.opencv_core.cvClearMemStorage;
@@ -24,7 +21,6 @@ import static org.bytedeco.javacpp.opencv_core.cvFlip;
 import static org.bytedeco.javacpp.opencv_core.cvGetSeqElem;
 import static org.bytedeco.javacpp.opencv_core.cvLoad;
 import static org.bytedeco.javacpp.opencv_core.cvPoint;
-import static org.bytedeco.javacpp.opencv_core.cvPutText;
 import static org.bytedeco.javacpp.opencv_core.cvRectangle;
 import org.bytedeco.javacpp.opencv_highgui;
 import org.bytedeco.javacpp.opencv_highgui.CvCapture;
@@ -61,34 +57,11 @@ public class Webcam {
     }
 
     public static void startMenu() {
-
-        CvCapture capture = opencv_highgui.cvCreateCameraCapture(0);
-
-        opencv_highgui.cvSetCaptureProperty(capture,
-                opencv_highgui.CV_CAP_PROP_FRAME_HEIGHT, 400);
-        opencv_highgui.cvSetCaptureProperty(capture,
-                opencv_highgui.CV_CAP_PROP_FRAME_WIDTH, 500);
-
-        IplImage grabbedImage = opencv_highgui.cvQueryFrame(capture);
-        IplImage mirrorImage = grabbedImage.clone();
-        IplImage grayImage = IplImage.create(mirrorImage.width(),
-                mirrorImage.height(), IPL_DEPTH_8U, 1);
-
-        frame = new CanvasFrame("Menu", 1);
-        while (frame.isVisible()
-                && (grabbedImage = opencv_highgui.cvQueryFrame(capture))
-                != null) {
-
-
-            // Flip the image because a mirror image looks more natural
-            cvFlip(grabbedImage, mirrorImage, 1);
-            // Create a black and white image - best for face detection
-            // according to OpenCV sample.
-            cvCvtColor(mirrorImage, grayImage, CV_BGR2GRAY);
-
-            // display mirrorImage on frame
-            drawMenu(mirrorImage);
-            frame.showImage(mirrorImage);
+        MainMenu mainMenu = new MainMenu();
+        try {
+            mainMenu.startMenu();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -227,30 +200,6 @@ public class Webcam {
         }
     }
 
-    private static void drawMenu(IplImage image) {
-        CvFont font = new opencv_core.CvFont();
-
-        // sound
-        cvRectangle(image, cvPoint(0, 0), cvPoint(60, 60), CvScalar.BLUE, 3, CV_AA, 0);
-        opencv_core.cvInitFont(font, FONT_HERSHEY_SIMPLEX, 0.2, 1);
-        cvPutText(image, "dzwiek", cvPoint(65, 30), font, CvScalar.BLUE);
-
-        // exit
-        cvRectangle(image, cvPoint(580, 0), cvPoint(640, 60), CvScalar.RED, 3, CV_AA, 0);
-        opencv_core.cvInitFont(font, FONT_HERSHEY_SIMPLEX, 0.2, 1);
-        cvPutText(image, "wyjscie", cvPoint(500, 30), font, CvScalar.RED);
-
-        // 2 graczy
-        cvRectangle(image, cvPoint(0, 340), cvPoint(60, 400), CvScalar.YELLOW, 3, CV_AA, 0);
-        opencv_core.cvInitFont(font, FONT_HERSHEY_SIMPLEX, 0.2, 1);
-        cvPutText(image, "2 graczy", cvPoint(65, 380), font, CvScalar.YELLOW);
-
-        // start
-        cvRectangle(image, cvPoint(580, 340), cvPoint(640, 400), CvScalar.GREEN, 3, CV_AA, 0);
-        opencv_core.cvInitFont(font, FONT_HERSHEY_SIMPLEX, 0.2, 1);
-        cvPutText(image, "start", cvPoint(500, 380), font, CvScalar.GREEN);
-    }
-
     private static void randomField() {
         int counterBlack = 0;
         int counterGood = 0;
@@ -308,7 +257,7 @@ public class Webcam {
         for (int i = 0; i < rows; i++) {
             Arrays.fill(board[i], -1);
         }
-        recalcActualls((int) (Math.random()*rows), (int) (Math.random()*columns));
+        recalcActualls((int) (Math.random() * rows), (int) (Math.random() * columns));
         start = System.currentTimeMillis();
         end = -1;
     }
@@ -328,7 +277,7 @@ public class Webcam {
         try {
             records = new double[6];
             Arrays.fill(records, 999);
-            File f = new File("records"+rows+columns+".txt");
+            File f = new File("records" + rows + columns + ".txt");
             Scanner sc = new Scanner(f);
             int i = 0;
             while (sc.hasNextLine()) {
@@ -350,7 +299,7 @@ public class Webcam {
     private static void updateResults(double[] records) {
         FileWriter fw = null;
         try {
-            File f = new File("records"+rows+columns+".txt");
+            File f = new File("records" + rows + columns + ".txt");
             fw = new FileWriter(f);
             for (int i = 0; i < 5; i++) {
                 fw.append(records[i] + System.getProperty("line.separator"));
